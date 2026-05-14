@@ -1,0 +1,18 @@
+{
+    "name": "formalin/www",
+    "autoload": {
+        "psr-4": {
+            "Formalin\\Www\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Merkulova Elizaveta",
+            "email": "kurlyk013@gmail.com"
+        }
+    ],
+    "require": {
+        "guzzlehttp/guzzle": "^7.8",
+	    "predis/predis": "^3.4"
+    }
+}
