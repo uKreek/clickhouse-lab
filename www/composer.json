@@ -2,7 +2,7 @@
     "name": "formalin/www",
     "autoload": {
         "psr-4": {
-            "Formalin\\Www\\": "src/"
+            "App\\": ""
         }
     },
     "authors": [
@@ -12,7 +12,7 @@
         }
     ],
     "require": {
-        "guzzlehttp/guzzle": "^7.8",
+        "guzzlehttp/guzzle": "^7.10",
 	    "predis/predis": "^3.4"
     }
 }

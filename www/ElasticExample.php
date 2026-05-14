@@ -10,8 +10,7 @@ class ElasticExample
 
     public function __construct()
     {
-        // инициализация клиента elasticsearch
-        $this->client = ClientFactory::make('http://elasticsearch:9200/');
+        $this->client = ClientFactory::make('http://localhost:9200/');
     }
 
     public function indexDocument($index, $id, $data)

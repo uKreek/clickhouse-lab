@@ -1,179 +1,66 @@
 <?php
-require 'vendor/autoload.php';
-use App\Helpers\ClickhouseExample;
 
-// инициализация клиента
+require 'vendor/autoload.php';
+
+use App\ClickhouseExample;
+
+echo "<h3>Работа с ClickHouse: Транспорты</h3>";
+
 $click = new ClickhouseExample();
 
-// создание таблицы
-$click->query("
-    CREATE TABLE IF NOT EXISTS sensors (
-        id UUID DEFAULT generateUUIDv4(),
-        sensor_name String,
-        temperature Float32,
-        humidity Float32,
-        timestamp DateTime DEFAULT now()
+// 1. Проверяем доступность ClickHouse (считаем системные таблицы)
+echo "<p>Количество системных таблиц: " . $click->query('SELECT count() FROM system.tables') . "</p>";
+
+// 2. Создаем таблицу transports
+// Используем движок MergeTree, обязательный для большинства задач в ClickHouse
+$createTableSql = "
+    CREATE TABLE IF NOT EXISTS transports (
+       id UInt32,
+       type String,
+       brand String,
+       capacity UInt16,
+       created_at DateTime DEFAULT now()
     ) ENGINE = MergeTree()
-    ORDER BY timestamp;
-");
+    ORDER BY id;
+";
+$click->query($createTableSql);
+echo "<p>Таблица 'transports' успешно создана (или уже существует).</p>";
 
-// обработка формы
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $sensorName = htmlspecialchars($_POST['sensor_name']);
-    $temperature = floatval($_POST['temperature']);
-    $humidity = floatval($_POST['humidity']);
-    
-    // вставка данных
-    $click->query(sprintf(
-        "INSERT INTO sensors (sensor_name, temperature, humidity) VALUES ('%s', %f, %f)",
-        $sensorName, $temperature, $humidity
-    ));
-    
-    // перенаправление 
-    header("Location: /");
-    exit();
+// 3. Очищаем таблицу перед вставкой (чтобы при перезагрузке страницы данные не дублировались)
+$click->query("TRUNCATE TABLE transports;");
+
+// 4. Вставляем данные о транспорте
+$insertSql = "
+    INSERT INTO transports (id, type, brand, capacity) VALUES 
+    (1, 'Bus', 'Mercedes-Benz', 45), 
+    (2, 'Train', 'Siemens Desiro', 350),
+    (3, 'Car', 'Toyota Camry', 5),
+    (4, 'Airplane', 'Boeing 737', 189);
+";
+$click->query($insertSql);
+echo "<p>Данные о транспорте добавлены.</p>";
+
+// 5. Получаем и выводим данные
+// ClickHouse по умолчанию отдает данные в формате TSV, но мы можем запросить JSON
+$selectSql = "SELECT * FROM transports FORMAT JSON;";
+$resultJson = $click->query($selectSql);
+
+$data = json_decode($resultJson, true);
+
+// Красивый вывод результата
+echo "<h4>Список транспорта:</h4>";
+echo "<table border='1' cellpadding='5' style='border-collapse: collapse;'>";
+echo "<tr><th>ID</th><th>Тип</th><th>Марка</th><th>Вместимость (чел)</th><th>Дата записи</th></tr>";
+
+if (isset($data['data'])) {
+    foreach ($data['data'] as $row) {
+        echo "<tr>";
+        echo "<td>{$row['id']}</td>";
+        echo "<td>{$row['type']}</td>";
+        echo "<td>{$row['brand']}</td>";
+        echo "<td>{$row['capacity']}</td>";
+        echo "<td>{$row['created_at']}</td>";
+        echo "</tr>";
+    }
 }
-
-// получение всех данных
-$response = $click->query("SELECT * FROM sensors ORDER BY timestamp DESC FORMAT JSON");
-$data = json_decode($response, true);
-$sensors = $data['data'] ?? [];
-?>
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>отслеживание сенсоров</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f9fafb;
-            color: #374151;
-            margin: 0;
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .container {
-            max-width: 800px;
-            width: 100%;
-        }
-        h1, h2 {
-            font-weight: 500;
-        }
-        .card {
-            background: #fff;
-            border-radius: 8px;
-            padding: 2rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            margin-bottom: 2rem;
-        }
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-        label {
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-        input {
-            padding: 0.5rem;
-            border: 1px solid #d1d5db;
-            border-radius: 4px;
-            font-size: 1rem;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-        input:focus {
-            border-color: #3b82f6;
-        }
-        button {
-            background-color: #2563eb;
-            color: white;
-            padding: 0.75rem;
-            border: none;
-            border-radius: 4px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        button:hover {
-            background-color: #1d4ed8;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            text-align: left;
-            padding: 1rem;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        th {
-            background-color: #f3f4f6;
-            font-weight: 500;
-        }
-        tr:last-child td {
-            border-bottom: none;
-        }
-        .empty {
-            text-align: center;
-            color: #6b7280;
-            padding: 2rem;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="card">
-            <h1>добавить данные сенсора</h1>
-            <form method="POST" action="/">
-                <div>
-                    <label for="sensor_name">имя сенсора</label><br>
-                    <input type="text" id="sensor_name" name="sensor_name" required style="width: 100%;">
-                </div>
-                <div>
-                    <label for="temperature">температура (°C)</label><br>
-                    <input type="number" id="temperature" name="temperature" step="0.1" required style="width: 100%;">
-                </div>
-                <div>
-                    <label for="humidity">влажность (%)</label><br>
-                    <input type="number" id="humidity" name="humidity" step="0.1" required style="width: 100%;">
-                </div>
-                <button type="submit">сохранить</button>
-            </form>
-        </div>
-
-        <div class="card">
-            <h2>история показаний</h2>
-            <?php if (count($sensors) > 0): ?>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>сенсор</th>
-                            <th>температура</th>
-                            <th>влажность</th>
-                            <th>время</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($sensors as $sensor): ?>
-                            <tr>
-                                <td><?= htmlspecialchars($sensor['sensor_name']) ?></td>
-                                <td><?= number_format($sensor['temperature'], 1) ?> °C</td>
-                                <td><?= number_format($sensor['humidity'], 1) ?> %</td>
-                                <td><?= htmlspecialchars($sensor['timestamp']) ?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            <?php else: ?>
-                <div class="empty">нет данных для отображения</div>
-            <?php endif; ?>
-        </div>
-    </div>
-</body>
-</html>
+echo "</table>";
