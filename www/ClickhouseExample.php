@@ -10,7 +10,6 @@ class ClickhouseExample
 
     public function __construct()
     {
-        // ИСправлено: обращаемся к хосту 'clickhouse', а не 'localhost'
         $this->client = ClientFactory::make('http://clickhouse:8123/');
     }
 
