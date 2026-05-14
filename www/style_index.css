@@ -1,0 +1,79 @@
+:root {
+    --primary: #551136;
+    --bg: #c97ba3;
+    --text: #232222;
+    --card-bg: #ffffff;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    margin: 0;
+    bottom: 0;
+    padding: 40px 20px;
+}
+
+
+.container {
+    position: relative;
+    min-height: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+h1, h2, h3 { color: var(--primary); }
+
+/* Карточки */
+.card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    border-left: 5px solid var(--primary);
+}
+
+
+/* Навигация */
+.nav {
+    color: #fff;
+    padding: 15px;
+    bottom: 0;
+    background: #59b98f;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.nav a {
+    text-decoration: none;
+    color: var(--card-bg);
+    font-weight: bold;
+    margin: 0 15px;
+    transition: opacity 0.2s;
+}
+
+.nav a:hover { opacity: 0.7; }
+
+.table {
+    text-align: center;
+	width: 100%;
+	margin-bottom: 20px;
+	border: 10px solid #F2F8F8;
+	border-top: 3px solid #F2F8F8;
+	border-collapse: collapse; 
+}
+.table th {
+	font-weight: bold;
+	padding: 5px;
+	background: #F2F8F8;
+	border: none;
+	border-bottom: 3px solid #F2F8F8;
+}
+.table td {
+	padding: 5px;
+	border: none;
+	border-bottom: 5px solid #F2F8F8;
+}
+
