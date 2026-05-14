@@ -1,4 +1,59 @@
 <?php
+require 'vendor/autoload.php';
+
+// Добавляем стили
+echo "
+<style>
+    body {
+        background-color: #d986b1; /* Нежно-розовый фон */
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        margin: 0;
+        color: #4a4a4a;
+    }
+
+    h3, h4 {
+        color: #8b1b49; /* Насыщенный розовый для заголовков */
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    table {
+        background: white;
+        border-collapse: collapse;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        border-radius: 12px;
+        overflow: hidden;
+        border: none;
+        margin-top: 20px;
+    }
+
+    th {
+        background-color: #ffb6c1; /* Розовый для шапки таблицы */
+        color: white;
+        padding: 15px 25px;
+    }
+
+    td {
+        padding: 12px 20px;
+        text-align: center;
+        border-bottom: 1px solid #eee;
+    }
+
+    tr:hover {
+        background-color: #fff0f5; /* Подсветка строки при наведении */
+    }
+    
+    p {
+        font-weight: bold;
+    }
+</style>
+";
+
 
 require 'vendor/autoload.php';
 
