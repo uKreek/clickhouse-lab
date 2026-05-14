@@ -87,10 +87,10 @@ $click->query("TRUNCATE TABLE transports;");
 // 4. Вставляем данные о транспорте
 $insertSql = "
     INSERT INTO transports (id, type, brand, capacity) VALUES 
-    (1, 'Bus', 'Mercedes-Benz', 45), 
-    (2, 'Train', 'Siemens Desiro', 350),
-    (3, 'Car', 'Toyota Camry', 5),
-    (4, 'Airplane', 'Boeing 737', 189);
+    (1, 'Велосипед', 'Кама', 1), 
+    (2, 'Поезд', 'РЖД', 350),
+    (3, 'Сани', 'Дедушка Мороз', 2),
+    (4, 'Самолет', 'Уральские авиалини', 186);
 ";
 $click->query($insertSql);
 echo "<p>Данные о транспорте добавлены.</p>";
